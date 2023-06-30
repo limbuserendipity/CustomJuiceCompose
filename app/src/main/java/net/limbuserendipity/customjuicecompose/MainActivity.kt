@@ -8,6 +8,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.ui.Modifier
+import net.limbuserendipity.customjuicecompose.ui.screen.ClearPaperScreen
 import net.limbuserendipity.customjuicecompose.ui.theme.CustomJuiceComposeTheme
 
 class MainActivity : ComponentActivity() {
@@ -20,9 +21,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    Text(
-                        text = "Hello"
-                    )
+                    ClearPaperScreen()
                 }
             }
         }
