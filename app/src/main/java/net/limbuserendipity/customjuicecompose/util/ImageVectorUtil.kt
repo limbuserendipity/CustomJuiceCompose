@@ -12,7 +12,6 @@ fun ImageVector.colorPath(pathName: String, brush: Brush): ImageVector {
     }catch (e : Exception){
         e.printStackTrace()
     }
-
     return this
 }
 
@@ -24,7 +23,6 @@ fun ImageVector.colorImageVector(brush: Brush): ImageVector {
             f.set(node, brush)
         }
     }
-
     return this
 }
 
@@ -37,7 +35,6 @@ fun VectorGroup.allNodes(): List<VectorNode> {
             is VectorGroup -> all.addAll(node.allNodes())
         }
     }
-
     return all
 }
 

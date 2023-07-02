@@ -43,9 +43,7 @@ class SvgShape(
 }
 
 @Composable
-fun size(size : Dp) : Size = with(LocalDensity.current){
-    Size(size.toPx(),size.toPx())
-}
+fun size(size : Dp) : Size = size(size, size)
 
 @Composable
 fun size(weight: Dp, height : Dp) : Size = with(LocalDensity.current){
