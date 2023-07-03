@@ -8,10 +8,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.unit.dp
 import net.limbuserendipity.customjuicecompose.R
+import net.limbuserendipity.customjuicecompose.ui.component.IngredientPager
 import net.limbuserendipity.customjuicecompose.ui.component.JuiceCup
 import net.limbuserendipity.customjuicecompose.util.ingredientList
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun JuiceScreen(
 
@@ -23,9 +26,18 @@ fun JuiceScreen(
     val ingredients = remember { ingredientList.toMutableStateList() }
     val cupFullness: Float = ingredients.sumOf { it.fullness.toDouble() }.toFloat()
 
-    ingredients.map { it.fullness = 0.1f }
-
     Scaffold(
+        bottomBar = {
+            IngredientPager(
+                ingredients = ingredients,
+                onItemClick = { index, item ->
+                    ingredients[index] = item.copy(fullness = item.fullness + 0.10f)
+                },
+                modifier = Modifier
+                    .padding(top = 16.dp, bottom = 16.dp)
+                    .fillMaxWidth()
+            )
+        },
         modifier = Modifier.fillMaxSize()
     ) { paddingValues ->
 

@@ -12,6 +12,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
@@ -50,10 +51,11 @@ fun JuiceCup(
             ingredients = ingredients,
             maxHeight = height,
             cupFullness = cupFullness,
+            shape = shape,
             modifier = Modifier
                 .size(weight, height)
                 .border(
-                    BorderStroke(4.dp, Color.White), shape
+                    BorderStroke(2.dp, Color.White), shape
                 )
                 .clip(shape)
         )
@@ -73,6 +75,7 @@ fun JuiceColumn(
     ingredients: List<Ingredient>,
     maxHeight: Dp,
     cupFullness: Float,
+    shape : Shape,
     modifier: Modifier = Modifier,
     density: Density = LocalDensity.current
 ) {
@@ -99,6 +102,7 @@ fun JuiceColumn(
 
             JuiceItem(
                 color = SolidColor(ingredient.color.copy(alpha = 0.8f)),
+                shape = shape,
                 height = ingredientHeight,
                 modifier = Modifier.fillMaxWidth()
             )
@@ -113,6 +117,7 @@ fun JuiceColumn(
 @Composable
 fun JuiceItem(
     color: Brush,
+    shape : Shape,
     height: Dp,
     modifier: Modifier = Modifier
 ) {
@@ -120,7 +125,7 @@ fun JuiceItem(
     Box(
         modifier = modifier
             .height(height)
-            .background(color)
+            .background(color, shape)
     )
 
 }

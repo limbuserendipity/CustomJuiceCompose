@@ -29,10 +29,10 @@ class SvgShape(
         val parser = PathParser()
         parser.addPathNodes(imageVector.root.allPathNodes())
 
-        val cofX = shapeSize.width / imageVectorSize.width
-        val cofY = shapeSize.height / imageVectorSize.height
+        val ratioX = shapeSize.width / imageVectorSize.width
+        val ratioY = shapeSize.height / imageVectorSize.height
 
-        val matrix = scaleMatrix(cofX, cofY)
+        val matrix = scaleMatrix(ratioX, ratioY)
 
         val path = parser.toPath()
         path.asAndroidPath().transform(matrix)
