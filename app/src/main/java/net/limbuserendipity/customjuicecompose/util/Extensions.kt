@@ -24,8 +24,8 @@ fun MutableList<Any?>.swap(
 fun Modifier.coloredShadow(
     color: Color,
     alpha: Float = 0.6f,
-    borderRadius: Dp = 64.dp,
     shadowRadius: Dp = 4.dp,
+    borderRadius: Dp = 64.dp,
     offsetY: Dp = 2.dp,
     offsetX: Dp = 2.dp
 ) = composed {
