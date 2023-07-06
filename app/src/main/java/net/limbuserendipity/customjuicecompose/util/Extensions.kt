@@ -11,7 +11,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
-fun MutableList<Any?>.swap(
+fun <T> MutableList<T>.swap(
     index1: Int,
     index2: Int
 ) {
@@ -19,6 +19,8 @@ fun MutableList<Any?>.swap(
     this[index1] = this[index2]
     this[index2] = temp
 }
+
+fun Float.round() : Float = ((this * 10).toInt()).toFloat() / 10
 
 @SuppressLint("UnnecessaryComposedModifier")
 fun Modifier.coloredShadow(

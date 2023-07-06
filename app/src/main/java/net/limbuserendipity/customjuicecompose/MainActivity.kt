@@ -8,6 +8,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.ui.Modifier
+import net.limbuserendipity.customjuicecompose.ui.screen.ClearPaperScreen
 import net.limbuserendipity.customjuicecompose.ui.screen.JuiceScreen
 import net.limbuserendipity.customjuicecompose.ui.theme.CustomJuiceComposeTheme
 
