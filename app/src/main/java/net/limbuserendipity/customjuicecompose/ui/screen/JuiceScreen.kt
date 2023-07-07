@@ -86,7 +86,8 @@ fun JuiceScreen(
         JuiceCup(
             imageShape = iconShape,
             imageForeground = iconForeground,
-            ingredients = ingredients,
+            ingredients = ingredients
+                .filter { it.fullness > 0f },
             onIngredientClick = { ingredient ->
                 coroutine.launch {
                     pagerState.animateScrollToPage(ingredients.indexOf(ingredient))

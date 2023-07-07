@@ -1,23 +1,29 @@
 package net.limbuserendipity.customjuicecompose.ui.component
 
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.core.graphics.translationMatrix
 import net.limbuserendipity.customjuicecompose.ui.model.Ingredient
 import net.limbuserendipity.customjuicecompose.util.SvgShape
 import net.limbuserendipity.customjuicecompose.util.size
@@ -42,13 +48,13 @@ fun JuiceCup(
 
         val shape = SvgShape(
             imageVector = imageShape,
-            shapeSize = size(width, height),
-            imageVectorSize = Size(14f, 24f)
+            shapeSize = size(width, height)
         )
 
         JuiceColumn(
             ingredients = ingredients,
             onItemClick = onIngredientClick,
+            svgPath = shape.createPath(),
             maxWeight = width,
             maxHeight = height,
             cupFullness = cupFullness,
@@ -57,7 +63,6 @@ fun JuiceCup(
                 .border(
                     BorderStroke(2.dp, Color.White), shape
                 )
-                .clip(shape)
         )
 
         Image(
@@ -74,6 +79,7 @@ fun JuiceCup(
 fun JuiceColumn(
     ingredients: List<Ingredient>,
     onItemClick: (Ingredient) -> Unit,
+    svgPath: Path,
     maxWeight: Dp,
     maxHeight: Dp,
     cupFullness: Float,
@@ -81,46 +87,50 @@ fun JuiceColumn(
     density: Density = LocalDensity.current
 ) {
 
+    val animateFullness = animateFloatAsState(targetValue = cupFullness)
+
     Column(
         verticalArrangement = Arrangement.Bottom,
         horizontalAlignment = Alignment.Start,
         modifier = modifier
-    ) {
-
-        ingredients
-            .filter { it.fullness > 0f }
-            .sortedBy { it.fullness }
-            .forEachIndexed { index, ingredient ->
-
-                val ingredientHeight = with(density) {
-                    (ingredient.fullness * maxHeight.toPx()).toDp()
-                }
-                val animateHeight = animateDpAsState(targetValue = ingredientHeight)
-
-                JuiceItem(
-                    onClick = { onItemClick(ingredient) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(animateHeight.value)
-                        .background(ingredient.color, RectangleShape)
-                        .drawBehind {
-                            if (index == 0 && cupFullness != 1f) {
-                                val bottomWidth = with(density) {
-                                    maxWeight.toPx() * 12f / 14f
-                                }
-                                val desiredHeight = cupFullness * maxHeight.toPx()
-                                val widthRatio = (size.width - bottomWidth) / (maxHeight.toPx())
-                                val lineWidth = bottomWidth + (desiredHeight * widthRatio)
-
-                                drawTopOval(
-                                    color = lerp(ingredient.color, Color.Gray, 0.1f),
-                                    width = lineWidth
-                                )
-                            }
-                        }
+            .drawWithContent {
+                drawContent()
+                val rectPath = Path()
+                val h = animateFullness.value * size.height
+                val rH = maxHeight.toPx() - h
+                rectPath.addRect(
+                    rect = Rect(0f, rH + 30f, size.width, rH - 30f)
                 )
+                val newPath = Path.combine(PathOperation.Intersect, rectPath, svgPath)
+                val ovalPath = Path()
+                ovalPath.addOval(
+                    oval = newPath.getBounds()
+                )
+                if (!ingredients.isEmpty())
+                    drawPath(
+                        path = ovalPath,
+                        color = lerp(ingredients.last().color, Color.Gray, 0.1f)
+                    )
+
             }
+    ) {
+        for (i in ingredients.lastIndex downTo 0) {
+            val ingredient = ingredients[i]
+            val ingredientHeight = with(density) {
+                (ingredient.fullness * maxHeight.toPx()).toDp()
+            }
+            val animateHeight = animateDpAsState(targetValue = ingredientHeight)
+
+            JuiceItem(
+                onClick = { onItemClick(ingredient) },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(animateHeight.value)
+                    .background(ingredient.color, RectangleShape)
+            )
+        }
     }
+
 }
 
 @Composable
@@ -131,21 +141,5 @@ fun JuiceItem(
     Box(
         modifier = modifier
             .clickable(onClick = onClick)
-    )
-}
-
-fun DrawScope.drawTopOval(
-    color: Color,
-    width: Float
-) {
-    val paint = Paint()
-    paint.color = color
-    paint.style = PaintingStyle.Fill
-    drawContext.canvas.drawOval(
-        left = size.width - width,
-        top = 40f,
-        right = width,
-        bottom = -20f,
-        paint = paint
     )
 }
