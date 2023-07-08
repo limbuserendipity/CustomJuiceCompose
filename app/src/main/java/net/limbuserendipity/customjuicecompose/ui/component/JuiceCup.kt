@@ -63,6 +63,7 @@ fun JuiceCup(
                 .border(
                     BorderStroke(2.dp, Color.White), shape
                 )
+                .clip(shape)
         )
 
         Image(
@@ -87,7 +88,10 @@ fun JuiceColumn(
     density: Density = LocalDensity.current
 ) {
 
-    val animateFullness = animateFloatAsState(targetValue = cupFullness)
+    val animateFullness = animateFloatAsState(
+        targetValue = cupFullness,
+        animationSpec = defaultProgressAnimationSpec()
+    )
 
     Column(
         verticalArrangement = Arrangement.Bottom,
@@ -119,7 +123,10 @@ fun JuiceColumn(
             val ingredientHeight = with(density) {
                 (ingredient.fullness * maxHeight.toPx()).toDp()
             }
-            val animateHeight = animateDpAsState(targetValue = ingredientHeight)
+            val animateHeight = animateDpAsState(
+                targetValue = ingredientHeight,
+                animationSpec = defaultProgressAnimationSpec()
+            )
 
             JuiceItem(
                 onClick = { onItemClick(ingredient) },

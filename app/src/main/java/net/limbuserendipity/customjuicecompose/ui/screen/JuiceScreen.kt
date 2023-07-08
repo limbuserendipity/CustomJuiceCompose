@@ -1,30 +1,23 @@
 package net.limbuserendipity.customjuicecompose.ui.screen
 
-import android.annotation.SuppressLint
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import net.limbuserendipity.customjuicecompose.R
 import net.limbuserendipity.customjuicecompose.ui.component.IngredientPager
 import net.limbuserendipity.customjuicecompose.ui.component.JuiceCup
-import net.limbuserendipity.customjuicecompose.ui.model.Ingredient
+import net.limbuserendipity.customjuicecompose.ui.component.Progress
+import net.limbuserendipity.customjuicecompose.ui.model.ProgressState
 import net.limbuserendipity.customjuicecompose.util.ingredientList
 import net.limbuserendipity.customjuicecompose.util.round
-import net.limbuserendipity.customjuicecompose.util.swap
-import java.util.LinkedList
-import kotlin.math.roundToInt
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -39,7 +32,7 @@ fun JuiceScreen(
     val cupFullness: Float = ingredients.sumOf { it.fullness.toDouble() }.toFloat()
         .coerceIn(0f..1f)
 
-    val animateFullness = animateFloatAsState(targetValue = cupFullness)
+    var progressState by remember { mutableStateOf(ProgressState.Quietly) }
 
     val isFull = cupFullness == 1f
     val juiceOz = 0.1f
@@ -49,16 +42,14 @@ fun JuiceScreen(
 
     Scaffold(
         topBar = {
-            Row(
-                horizontalArrangement = Arrangement.Center,
+            Progress(
+                cupFullness = cupFullness,
+                progressState = progressState,
+                onProgressState = { progress ->
+                    progressState = progress
+                },
                 modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(
-                    text = "${(animateFullness.value * 100f).roundToInt()}%",
-                    fontWeight = FontWeight.Bold,
-                    style = MaterialTheme.typography.h2
-                )
-            }
+            )
         },
         bottomBar = {
             IngredientPager(
@@ -67,11 +58,13 @@ fun JuiceScreen(
                     val fullness = if(item.fullness + juiceOz > 1f) 1f
                     else item.fullness + juiceOz
                     ingredients[index] = item.copy(fullness = fullness.round())
+                    progressState = ProgressState.Progress
                 },
                 onItemRemoveClick = { index, item ->
                     val fullness = if(item.fullness - juiceOz < 0f) 0f
                     else item.fullness - juiceOz
                     ingredients[index] = item.copy(fullness = fullness.round())
+                    progressState = ProgressState.Progress
                 },
                 isFull = isFull,
                 pagerState = pagerState,
