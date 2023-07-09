@@ -165,7 +165,7 @@ fun Progress(
 fun <T> defaultProgressAnimationSpec(
     durationMillis: Int = 300,
     delayMillis: Int = 0,
-    easing: Easing = LinearEasing
+    easing: Easing = FastOutSlowInEasing
 ) = tween<T>(
     durationMillis = durationMillis,
     delayMillis = delayMillis,
