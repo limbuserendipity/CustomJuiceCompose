@@ -16,6 +16,7 @@ import net.limbuserendipity.customjuicecompose.ui.component.IngredientPager
 import net.limbuserendipity.customjuicecompose.ui.component.JuiceCup
 import net.limbuserendipity.customjuicecompose.ui.component.Progress
 import net.limbuserendipity.customjuicecompose.ui.model.ProgressState
+import net.limbuserendipity.customjuicecompose.ui.model.UiState
 import net.limbuserendipity.customjuicecompose.util.ingredientList
 import net.limbuserendipity.customjuicecompose.util.round
 
@@ -32,7 +33,7 @@ fun JuiceScreen(
     val cupFullness: Float = ingredients.sumOf { it.fullness.toDouble() }.toFloat()
         .coerceIn(0f..1f)
 
-    var progressState by remember { mutableStateOf(ProgressState.Quietly) }
+    var uiState : UiState by remember { mutableStateOf(UiState.Quietly) }
 
     val isFull = cupFullness == 1f
     val juiceOz = 0.1f
@@ -44,9 +45,9 @@ fun JuiceScreen(
         topBar = {
             Progress(
                 cupFullness = cupFullness,
-                progressState = progressState,
-                onProgressState = { progress ->
-                    progressState = progress
+                uiState = uiState,
+                onUiState = { state ->
+                    uiState = state
                 },
                 modifier = Modifier.fillMaxWidth()
             )
@@ -58,13 +59,13 @@ fun JuiceScreen(
                     val fullness = if(item.fullness + juiceOz > 1f) 1f
                     else item.fullness + juiceOz
                     ingredients[index] = item.copy(fullness = fullness.round())
-                    progressState = ProgressState.Progress
+                    uiState = UiState.Progress
                 },
                 onItemRemoveClick = { index, item ->
                     val fullness = if(item.fullness - juiceOz < 0f) 0f
                     else item.fullness - juiceOz
                     ingredients[index] = item.copy(fullness = fullness.round())
-                    progressState = ProgressState.Progress
+                    uiState = UiState.Progress
                 },
                 isFull = isFull,
                 pagerState = pagerState,

@@ -106,7 +106,6 @@ fun JuiceColumn(
             val ovalHeight = 30f
 
             JuiceItem(
-                text = "$topHeight & ${ingredient.fullness}",
                 onClick = { onItemClick(ingredient) },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -132,17 +131,13 @@ fun JuiceColumn(
 
 @Composable
 fun JuiceItem(
-    text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Box(
-        contentAlignment = Alignment.Center,
         modifier = modifier
             .clickable(onClick = onClick)
-    ) {
-        Text(text = text)
-    }
+    )
 }
 
 fun DrawScope.drawTopOval(

@@ -15,88 +15,40 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import net.limbuserendipity.customjuicecompose.ui.model.ProgressState
+import net.limbuserendipity.customjuicecompose.ui.model.UiState
 import net.limbuserendipity.customjuicecompose.ui.theme.appleColor
-import net.limbuserendipity.customjuicecompose.ui.theme.coconutColor
 import kotlin.math.roundToInt
 
 @Composable
 fun Progress(
     cupFullness: Float,
-    progressState: ProgressState,
-    onProgressState: (ProgressState) -> Unit,
+    uiState: UiState,
+    onUiState: (UiState) -> Unit,
     modifier: Modifier = Modifier,
+    progressState: ProgressState = uiState.progressState(),
     shape: Shape = CircleShape,
-    defaultColor: Color = MaterialTheme.colors.surface,
-    defaultContentColor: Color = MaterialTheme.colors.primary,
     border: BorderStroke? = null,
     elevation: Dp = 0.dp,
 ) {
 
-    if (cupFullness == 1f && progressState != ProgressState.Completed)
-        onProgressState(ProgressState.Complete)
+    if (cupFullness == 1f && uiState !is UiState.Completed)
+        onUiState(UiState.Complete)
 
     val animateFullness = animateFloatAsState(
         targetValue = cupFullness,
         animationSpec = defaultProgressAnimationSpec(),
         finishedListener = {
-            if (progressState == ProgressState.Progress) onProgressState(ProgressState.Quietly)
+            if (uiState == UiState.Progress) onUiState(UiState.Quietly)
         }
     )
-    val backgroundColor : Color
-    val contentColor: Color
-    val contentScale : Float
-    val fullnessTextStyle: TextStyle
-    val completeText : String
-    val completeIcon : ImageVector
-    val visibleCompleteContent : Boolean
-    when (progressState) {
-        ProgressState.Quietly -> {
-            backgroundColor = defaultColor
-            contentColor = Color.LightGray
-            contentScale = 0.8f
-            fullnessTextStyle = MaterialTheme.typography.h3
-            completeText = ""
-            completeIcon = Icons.Default.KeyboardArrowRight
-            visibleCompleteContent = false
-        }
-        ProgressState.Progress -> {
-            backgroundColor = defaultColor
-            contentColor = defaultContentColor
-            contentScale = 1f
-            fullnessTextStyle = MaterialTheme.typography.h3
-            completeText = ""
-            completeIcon = Icons.Default.KeyboardArrowRight
-            visibleCompleteContent = false
-        }
-        ProgressState.Complete -> {
-            backgroundColor = contentColorFor(defaultColor)
-            contentColor = contentColorFor(defaultContentColor)
-            contentScale = 1f
-            fullnessTextStyle = MaterialTheme.typography.body2
-            completeText = "Complete"
-            completeIcon = Icons.Default.KeyboardArrowRight
-            visibleCompleteContent = true
-        }
-        ProgressState.Completed -> {
-            backgroundColor = contentColorFor(defaultColor)
-            contentColor = appleColor
-            contentScale = 1f
-            fullnessTextStyle = MaterialTheme.typography.h5
-            completeText = "Completed"
-            completeIcon = Icons.Default.Check
-            visibleCompleteContent = true
-        }
-    }
 
-    val animateContentColor = animateColorAsState(targetValue = contentColor)
-    val animateBackgroundColor = animateColorAsState(targetValue = backgroundColor)
-    val animateContentScale = animateFloatAsState(targetValue = contentScale)
+    val animateContentColor = animateColorAsState(targetValue = progressState.contentColor)
+    val animateBackgroundColor = animateColorAsState(targetValue = progressState.backgroundColor)
+    val animateContentScale = animateFloatAsState(targetValue = progressState.contentScale)
 
     Surface(
         shape = shape,
@@ -115,44 +67,44 @@ fun Progress(
         ) {
 
             AnimatedVisibility(
-                visible = progressState == ProgressState.Completed
+                visible = uiState is UiState.Completed
             ) {
                 ActionItem(
                     icon = Icons.Default.ArrowBack,
                     onClick = {
-                        onProgressState(ProgressState.Complete)
+                        onUiState(UiState.Complete)
                     },
                     color = MaterialTheme.colors.surface
                 )
             }
 
             AnimatedVisibility(
-                visible = progressState != ProgressState.Completed
+                visible = uiState !is UiState.Completed
             ) {
                 Text(
                     text = "${(animateFullness.value * 100f).roundToInt()}%",
                     fontWeight = FontWeight.Bold,
-                    style = fullnessTextStyle
+                    style = progressState.fullnessTextStyle
                 )
             }
 
             AnimatedVisibility(
-                visible = visibleCompleteContent
+                visible = progressState.visibleCompleteContent
             ) {
                 Text(
-                    text = completeText,
+                    text = progressState.completeText,
                     fontWeight = FontWeight.Bold,
                     style = MaterialTheme.typography.h5
                 )
             }
 
             AnimatedVisibility(
-                visible = visibleCompleteContent
+                visible = progressState.visibleCompleteContent
             ) {
                 ActionItem(
-                    icon = completeIcon,
+                    icon = progressState.completeIcon,
                     onClick = {
-                        onProgressState(ProgressState.Completed)
+                        onUiState(UiState.Completed)
                     },
                     color = MaterialTheme.colors.surface
                 )
@@ -170,4 +122,56 @@ fun <T> defaultProgressAnimationSpec(
     durationMillis = durationMillis,
     delayMillis = delayMillis,
     easing = easing
+)
+
+@Composable
+fun UiState.progressState() = when (this) {
+    is UiState.Quietly -> progressState()
+    is UiState.Progress -> progressState()
+    is UiState.Complete -> progressState()
+    is UiState.Completed -> progressState()
+}
+
+@Composable
+fun UiState.Quietly.progressState() = ProgressState(
+    backgroundColor = MaterialTheme.colors.surface,
+    contentColor = Color.LightGray,
+    contentScale = 0.8f,
+    fullnessTextStyle = MaterialTheme.typography.h3,
+    completeText = "",
+    completeIcon = Icons.Default.KeyboardArrowRight,
+    visibleCompleteContent = false,
+)
+
+@Composable
+fun UiState.Progress.progressState() = ProgressState(
+    backgroundColor = MaterialTheme.colors.surface,
+    contentColor = MaterialTheme.colors.primary,
+    contentScale = 1f,
+    fullnessTextStyle = MaterialTheme.typography.h3,
+    completeText = "",
+    completeIcon = Icons.Default.KeyboardArrowRight,
+    visibleCompleteContent = false,
+)
+
+@Composable
+fun UiState.Complete.progressState() = ProgressState(
+    backgroundColor = contentColorFor(MaterialTheme.colors.surface),
+    contentColor = contentColorFor(MaterialTheme.colors.primary),
+    contentScale = 1f,
+    fullnessTextStyle = MaterialTheme.typography.body2,
+    completeText = "Complete",
+    completeIcon = Icons.Default.KeyboardArrowRight,
+    visibleCompleteContent = true,
+)
+
+@Composable
+fun UiState.Completed.progressState() = ProgressState(
+    backgroundColor = contentColorFor(MaterialTheme.colors.surface),
+    contentColor = appleColor,
+    contentScale = 1f,
+    fullnessTextStyle = MaterialTheme.typography.h5,
+    completeText = "Completed",
+    completeIcon = Icons.Default.Check,
+    visibleCompleteContent = true,
 )
