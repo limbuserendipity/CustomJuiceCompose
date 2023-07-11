@@ -5,11 +5,14 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.TextStyle
 
 data class ProgressState(
-    val backgroundColor : Color,
+    val backgroundColor: Color,
     val contentColor: Color,
-    val contentScale : Float,
+    val contentScale: Float,
     val fullnessTextStyle: TextStyle,
-    val completeText : String,
-    val completeIcon : ImageVector,
-    val visibleCompleteContent : Boolean
+    val visibleCompleteContent: Boolean,
+    val completeText: String,
+    val completeIcon: ImageVector,
+    val completeIconColor: Color,
+    val completeIconBackground: Color,
+    val visibleCompletedContent: Boolean,
 )

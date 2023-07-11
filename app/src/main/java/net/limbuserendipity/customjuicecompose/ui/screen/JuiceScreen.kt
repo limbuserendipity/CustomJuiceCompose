@@ -15,7 +15,6 @@ import net.limbuserendipity.customjuicecompose.R
 import net.limbuserendipity.customjuicecompose.ui.component.IngredientPager
 import net.limbuserendipity.customjuicecompose.ui.component.JuiceCup
 import net.limbuserendipity.customjuicecompose.ui.component.Progress
-import net.limbuserendipity.customjuicecompose.ui.model.ProgressState
 import net.limbuserendipity.customjuicecompose.ui.model.UiState
 import net.limbuserendipity.customjuicecompose.util.ingredientList
 import net.limbuserendipity.customjuicecompose.util.round
@@ -59,13 +58,13 @@ fun JuiceScreen(
                     val fullness = if(item.fullness + juiceOz > 1f) 1f
                     else item.fullness + juiceOz
                     ingredients[index] = item.copy(fullness = fullness.round())
-                    uiState = UiState.Progress
+                    uiState = UiState.InProgress
                 },
                 onItemRemoveClick = { index, item ->
                     val fullness = if(item.fullness - juiceOz < 0f) 0f
                     else item.fullness - juiceOz
                     ingredients[index] = item.copy(fullness = fullness.round())
-                    uiState = UiState.Progress
+                    uiState = UiState.InProgress
                 },
                 isFull = isFull,
                 pagerState = pagerState,
