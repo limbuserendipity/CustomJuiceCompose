@@ -36,9 +36,6 @@ fun Progress(
     elevation: Dp = 0.dp,
 ) {
 
-    if (cupFullness == 1f && uiState !is UiState.Completed)
-        onUiState(UiState.Complete)
-
     val animateFullness = animateFloatAsState(
         targetValue = cupFullness,
         animationSpec = defaultProgressAnimationSpec(),

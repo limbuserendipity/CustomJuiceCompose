@@ -1,5 +1,6 @@
 package net.limbuserendipity.customjuicecompose.ui.screen
 
+import androidx.compose.animation.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.PagerState
@@ -25,17 +26,18 @@ fun JuiceScreen(
 
 ) {
 
-    val iconShape = ImageVector.vectorResource(id = R.drawable.cup_shape)
-    val iconForeground = ImageVector.vectorResource(id = R.drawable.cup_foreground)
+    var uiState: UiState by remember { mutableStateOf(UiState.Quietly) }
+
+    val juiceOz = 0.1f
 
     val ingredients = remember { ingredientList.toMutableStateList() }
     val cupFullness: Float = ingredients.sumOf { it.fullness.toDouble() }.toFloat()
         .coerceIn(0f..1f)
 
-    var uiState : UiState by remember { mutableStateOf(UiState.Quietly) }
+    if (cupFullness == 1f && uiState !is UiState.Completed) uiState = UiState.Complete
 
-    val isFull = cupFullness == 1f
-    val juiceOz = 0.1f
+    val iconShape = ImageVector.vectorResource(id = R.drawable.cup_shape)
+    val iconForeground = ImageVector.vectorResource(id = R.drawable.cup_foreground)
 
     val pagerState: PagerState = rememberPagerState()
     val coroutine = rememberCoroutineScope()
@@ -52,26 +54,32 @@ fun JuiceScreen(
             )
         },
         bottomBar = {
-            IngredientPager(
-                ingredients = ingredients,
-                onItemAddClick = { index, item ->
-                    val fullness = if(item.fullness + juiceOz > 1f) 1f
-                    else item.fullness + juiceOz
-                    ingredients[index] = item.copy(fullness = fullness.round())
-                    uiState = UiState.InProgress
-                },
-                onItemRemoveClick = { index, item ->
-                    val fullness = if(item.fullness - juiceOz < 0f) 0f
-                    else item.fullness - juiceOz
-                    ingredients[index] = item.copy(fullness = fullness.round())
-                    uiState = UiState.InProgress
-                },
-                isFull = isFull,
-                pagerState = pagerState,
-                modifier = Modifier
-                    .padding(top = 16.dp, bottom = 16.dp)
-                    .fillMaxWidth()
-            )
+            AnimatedVisibility(
+                visible = uiState !is UiState.Completed,
+                enter = slideInVertically { height -> height } + fadeIn(),
+                exit = slideOutVertically { height -> height } + fadeOut()
+            ) {
+                IngredientPager(
+                    ingredients = ingredients,
+                    onItemAddClick = { index, item ->
+                        val fullness = if (item.fullness + juiceOz > 1f) 1f
+                        else item.fullness + juiceOz
+                        ingredients[index] = item.copy(fullness = fullness.round())
+                        uiState = UiState.InProgress
+                    },
+                    onItemRemoveClick = { index, item ->
+                        val fullness = if (item.fullness - juiceOz < 0f) 0f
+                        else item.fullness - juiceOz
+                        ingredients[index] = item.copy(fullness = fullness.round())
+                        uiState = UiState.InProgress
+                    },
+                    uiState = uiState,
+                    pagerState = pagerState,
+                    modifier = Modifier
+                        .padding(top = 16.dp, bottom = 16.dp)
+                        .fillMaxWidth()
+                )
+            }
         },
         modifier = Modifier.fillMaxSize()
     ) { paddingValues ->

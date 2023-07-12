@@ -22,6 +22,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import net.limbuserendipity.customjuicecompose.ui.model.Ingredient
+import net.limbuserendipity.customjuicecompose.ui.model.UiState
 import net.limbuserendipity.customjuicecompose.util.coloredShadow
 import kotlin.math.absoluteValue
 
@@ -31,7 +32,7 @@ fun IngredientPager(
     ingredients: List<Ingredient>,
     onItemAddClick: (Int, Ingredient) -> Unit,
     onItemRemoveClick: (Int, Ingredient) -> Unit,
-    isFull: Boolean,
+    uiState: UiState,
     modifier: Modifier = Modifier,
     pagerState: PagerState = rememberPagerState(),
     pageSize: Dp = 104.dp
@@ -54,7 +55,7 @@ fun IngredientPager(
             onAddClick = { onItemAddClick(index, item) },
             onRemoveClick = { onItemRemoveClick(index, item) },
             size = pageSize,
-            isFull = isFull,
+            isFull = uiState is UiState.Complete,
             pageOffset = pageOffset,
             modifier = pageModifier
         )
