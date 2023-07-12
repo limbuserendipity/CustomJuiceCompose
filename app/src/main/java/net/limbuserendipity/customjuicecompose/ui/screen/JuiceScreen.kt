@@ -1,6 +1,8 @@
 package net.limbuserendipity.customjuicecompose.ui.screen
 
+import android.annotation.SuppressLint
 import androidx.compose.animation.*
+import androidx.compose.animation.core.animate
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.PagerState
@@ -8,7 +10,10 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
@@ -20,6 +25,7 @@ import net.limbuserendipity.customjuicecompose.ui.model.UiState
 import net.limbuserendipity.customjuicecompose.util.ingredientList
 import net.limbuserendipity.customjuicecompose.util.round
 
+@SuppressLint("CoroutineCreationDuringComposition")
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun JuiceScreen(
@@ -42,6 +48,10 @@ fun JuiceScreen(
     val pagerState: PagerState = rememberPagerState()
     val coroutine = rememberCoroutineScope()
 
+    var degrees by remember { mutableStateOf(0f) }
+
+    val density = LocalDensity.current
+
     Scaffold(
         topBar = {
             Progress(
@@ -50,7 +60,8 @@ fun JuiceScreen(
                 onUiState = { state ->
                     uiState = state
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
             )
         },
         bottomBar = {
@@ -81,7 +92,9 @@ fun JuiceScreen(
                 )
             }
         },
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
+            .animateContentSize()
     ) { paddingValues ->
 
         JuiceCup(
@@ -95,11 +108,29 @@ fun JuiceScreen(
                 }
             },
             cupFullness = cupFullness,
+            isCompleted = uiState is UiState.Completed,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
+                .rotate(degrees)
         )
 
+    }
+
+    LaunchedEffect(key1 = uiState is UiState.Completed){
+        if(uiState is UiState.Completed){
+            repeat(3){
+                animate(degrees,8f){ value, _ ->
+                    degrees = value
+                }
+                animate(degrees,-8f){ value, _ ->
+                    degrees = value
+                }
+            }
+        }
+        animate(degrees,0f){ value, _ ->
+            degrees = value
+        }
     }
 
 }
