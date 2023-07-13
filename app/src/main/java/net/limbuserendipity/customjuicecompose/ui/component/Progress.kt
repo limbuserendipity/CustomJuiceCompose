@@ -20,7 +20,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import net.limbuserendipity.customjuicecompose.ui.model.ProgressState
 import net.limbuserendipity.customjuicecompose.ui.model.UiState
-import net.limbuserendipity.customjuicecompose.ui.theme.appleColor
 import net.limbuserendipity.customjuicecompose.ui.theme.juiceGreen
 import kotlin.math.roundToInt
 
@@ -29,6 +28,7 @@ fun Progress(
     cupFullness: Float,
     uiState: UiState,
     onUiState: (UiState) -> Unit,
+    onReceiptActionClick : () -> Unit,
     modifier: Modifier = Modifier,
     progressState: ProgressState = uiState.progressState(),
     shape: Shape = CircleShape,
@@ -115,9 +115,7 @@ fun Progress(
             ) {
                 ActionItem(
                     icon = Icons.Default.Reorder,
-                    onClick = {
-                        onUiState(UiState.Completed)
-                    },
+                    onClick = { onReceiptActionClick() },
                     color = MaterialTheme.colors.surface,
                 )
             }
